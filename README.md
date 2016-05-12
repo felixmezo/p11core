@@ -1,2 +1,2 @@
-# practica10
-Practica 10 CORE 2015-2016
+# practica11
+Practica 11 CORE 2015-2016
