@@ -1,5 +1,3 @@
-
-
 var models = require('../models');
 var Sequelize = require('sequelize');
 
@@ -20,34 +18,45 @@ exports.load = function(req, res, next, quizId) {
 
 // GET /quizzes
 exports.index = function(req, res, next) {
-  if (!req.query.search) {
-    models.Quiz.findAll()
-      .then(function(quizzes) {
-        res.render('quizzes/index.ejs', { quizzes: quizzes});
-      })
-      .catch(function(error) {
-        next(error);
-      });
-  }else{
-    models.Quiz.findAll({ where: ["question like ?",'%' + req.query.search + '%']})
-      .then(models.Quiz.findAll({ order: ['question','DESC']}))
-      .then(function(quizzes) {
-        res.render('quizzes/index.ejs', { quizzes: quizzes});
-      })
-      .catch(function(error) {
-        next(error);
-      });
+  var tipo = req.params.format;
+  if (tipo == "json") {
+    models.Quiz.findAll().then(function (quizzes) {
+      res.send("<html><head></head><body>"+JSON.stringify(quizzes)+"</body></html>");
+    })
+}else{
+    if (!req.query.search) {
+      models.Quiz.findAll()
+        .then(function(quizzes) {
+          res.render('quizzes/index.ejs', { quizzes: quizzes});
+        })
+        .catch(function(error) {
+          next(error);
+        });
+    }else{
+      models.Quiz.findAll({ where: ["question like ?",'%' + req.query.search + '%']})
+        .then(models.Quiz.findAll({ order: ['question']}))
+        .then(function(quizzes) {
+          res.render('quizzes/index.ejs', { quizzes: quizzes});
+        })
+        .catch(function(error) {
+          next(error);
+        });
+    }
   }  
 };
 
 
 // GET /quizzes/:id
 exports.show = function(req, res, next) {
+  var tipo = req.params.format;
+  if (tipo == "json") {
+    res.send("<html><head></head><body>"+JSON.stringify(req.quiz)+"</body></html>");
+  }else{
+    var answer = req.query.answer || '';
 
-  var answer = req.query.answer || '';
-
-  res.render('quizzes/show', {quiz: req.quiz,
-                answer: answer});
+    res.render('quizzes/show', {quiz: req.quiz,
+                  answer: answer});
+  }
 };
 
 
